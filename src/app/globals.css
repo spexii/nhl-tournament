@@ -4,8 +4,47 @@
 
 
 body {
+  background: #161414;
   color: white;
-  background: #355E3B;
+  display: flex;
+  min-height: 100vh;
+  margin: 0;
+  justify-content: center;
+  font-family: var(--font-montserrat);
+  font-optical-sizing: auto;
+  font-size: 16px;
+}
+
+h1 {
+  display: block;
+  font-size: 2em;
+  margin-top: 0.67em;
+  margin-bottom: 0.67em;
+  margin-left: 0;
+  margin-right: 0;
+  font-weight: bold;
+}
+
+.top {
+  width: 100%;
+}
+
+.top img {
+  max-width: 100%;
+  height: auto;
+}
+
+nav a.selected::after {
+  position: absolute;
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #09ca09;
+  border-radius: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -8px;
+  content: "";
 }
 
 @layer utilities {
