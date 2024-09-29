@@ -9,7 +9,7 @@ const openSans = Open_Sans({ subsets: ["latin"], variable: '--font-open-sans' })
 
 export const metadata: Metadata = {
   title: "Shemale Cup",
-  description: "Shemale Cup",
+  description: "Shemale Cup - NHL-pelisarjan turnaussivusto",
 };
 
 export default async function RootLayout({
