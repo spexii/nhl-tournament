@@ -1,5 +1,5 @@
 import { Role as PrismaRole } from '@prisma/client';
-import { Role as TypeScriptRole } from '@/types/userRoles';
+import { Role as TypeScriptRole } from '@/types/user';
 
 export const convertPrismaRoleToTypeScriptRole = (role: PrismaRole): TypeScriptRole => {
   switch (role) {
@@ -12,4 +12,4 @@ export const convertPrismaRoleToTypeScriptRole = (role: PrismaRole): TypeScriptR
   }
 };
 
-export const isAdmin = (role: TypeScriptRole) => role === TypeScriptRole.ADMIN;
+export const isAdmin = (role: TypeScriptRole | undefined) => role === TypeScriptRole.ADMIN;

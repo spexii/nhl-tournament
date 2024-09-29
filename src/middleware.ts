@@ -1,60 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 import {
-  decodeAuthToken,
-  generateAuthToken,
   getAdminPaths,
-  getSessionCookie,
-  setSessionCookie
+  getPublicPaths,
+  getUserFromRequest,
 } from '@/lib/auth';
+import { auth } from '@/lib/nextAuth';
 import { isAdmin } from './lib/utils';
 
-export async function middleware(request: NextRequest) {
-  const sessionCookie = await getSessionCookie();
+export default auth((request) => {
+  const authenticatedUser = getUserFromRequest(request.auth);
 
   const res = NextResponse.next();
+  const publicPaths = getPublicPaths();
 
-  const nonRedirectPaths = ['/', '/login'];
+  if(authenticatedUser) {
+    // If in login page, redirect to home
+    if(request.nextUrl.pathname === '/login') {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
 
-  const adminPaths = getAdminPaths();
-  const isAdminPath = adminPaths.some((path) => request.nextUrl.pathname.startsWith(path));
+    const adminPaths = getAdminPaths();
+    const isAdminPath = adminPaths.some((path) => request.nextUrl.pathname.startsWith(path));
+    const admin = isAdmin(authenticatedUser.role);
 
-  if(sessionCookie) {
-    try {
-      // Decode the current auth token
-      const decodedAuthToken = await decodeAuthToken(sessionCookie.value);
-
-      // Regenerate new auth token with new expiration time
-      const { username, role } = decodedAuthToken;
-      const admin = isAdmin(role);
-
-      const regeneratedToken = await generateAuthToken(username, role);
-      await setSessionCookie(res, regeneratedToken);
-
-      res.headers.set('X-User-Authenticated', 'true');
-
-      if(isAdminPath && !admin) {
-        return NextResponse.redirect(new URL('/', request.url));
-      }
-
-      res.headers.set('X-User-Admin', admin.toString());
-    } catch (error) {
-      console.error('Error decoding token', error);
+    // If user is not admin and tries to access admin path, redirect to home
+    if(isAdminPath && !admin) {
       return NextResponse.redirect(new URL('/', request.url));
     }
   } else {
-    res.headers.set('X-User-Authenticated', 'false');
-    res.headers.set('X-User-Admin', 'false');
-
-    if(!nonRedirectPaths.includes(request.nextUrl.pathname)) {
+    if(!publicPaths.includes(request.nextUrl.pathname)) {
       return NextResponse.redirect(new URL('/', request.url));
     }
   }
 
   return res;
-}
+});
 
-// Middleware is applied basically to all pages
 export const config = {
-  matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
+  matcher: ['/((?!api|_next/static|_next/image|images|favicon.ico|manifest.json|.*\\.png$).*)'],
 };

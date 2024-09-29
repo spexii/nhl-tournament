@@ -6,10 +6,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import Button from '@/components/Form/Button';
 import Input from '@/components/Form/Input';
 import Label from '@/components/Form/Label';
-import { getSessionCookie } from '@/lib/auth';
-import { useAuth } from '@/lib/AuthContext';
-import { SuccessfulLoginResponse } from '@/types/responses';
-import { Role } from '@/types/userRoles';
+import { authenticate } from '@/lib/actions';
  
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -17,95 +14,79 @@ const Login = () => {
   const [isClient, setIsClient] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const { setAuthenticated, setAdmin } = useAuth();
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    console.log('onSubmit')
-
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+      const result = await authenticate(username, password);
 
-      // Authentication successful, redirect to front page
-      if (response.ok) {
-        const responseBody: SuccessfulLoginResponse = await response.json();
-        const admin = responseBody.role === Role.ADMIN;
-        
-        setAuthenticated(true);
-        setAdmin(admin);
-        
+      if(result.success) {
         router.push('/');
       } else {
-        setError('Käyttäjätunnus tai salasana on väärin');
+        setError('Väärä käyttäjätunnus tai salasana!');
+        return;
       }
     } catch (error) {
-      setError('Kirjautuminen ei onnistunut.');
+      setError('Virhe kirjautumisessa!');
     }
   }
 
   useEffect(() => {
     setIsClient(true);
-
-    const getCookie = async () => {
-      const sessionCookie = await getSessionCookie();
-
-      if (sessionCookie) {
-        router.push('/')
-      }
-    }
-
-    getCookie();
   }, []);
 
+  // This is to prevent the form from rendering on the server
+  // because browser extensions may render their own stuff
+  // (e.g. icons from password managers) and that can cause
+  // hydration errors.
   if (!isClient) {
     return null;
   }
  
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <Label htmlFor="username">
-          Käyttäjätunnus
-        </Label>
-        <Input
-          type="text"
-          name="username"
-          id="username"
-          onChange={(e) => setUsername(e.target.value)}
-          value={username}
-        />
-      </div>
-      <div>
-        <Label htmlFor="password">
-          Salasana
-        </Label>
-        <Input
-          type="password"
-          name="password"
-          id="password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-        />
-      </div>
-      <div>
-        {error && (
-          <p className="text-red-600">
-            {error}
-          </p>
-        )}
-      </div>
-      <div>
-        <Button type="submit">
-          Kirjaudu
-        </Button>
-      </div>
-    </form>
+    <div className="max-w-xs mx-auto">
+      <h1 className="text-heading-green">
+        Kirjaudu sisään
+      </h1>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div>
+          <Label htmlFor="username">
+            Käyttäjätunnus
+          </Label>
+          <Input
+            type="text"
+            name="username"
+            id="username"
+            onChange={(e) => setUsername(e.target.value)}
+            value={username}
+          />
+        </div>
+        <div>
+          <Label htmlFor="password">
+            Salasana
+          </Label>
+          <Input
+            type="password"
+            name="password"
+            id="password"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+          />
+        </div>
+        <div>
+          {error && (
+            <p className="text-red-600">
+              {error}
+            </p>
+          )}
+        </div>
+        <div>
+          <Button type="submit">
+            Kirjaudu
+          </Button>
+        </div>
+      </form>
+    </div>
   )
 }
 
