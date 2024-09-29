@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:digitalocean": "npm install --production=false && npm run build && npm ci"
+    "build:digitalocean": "npm install --production=false && npm run build && npm ci",
     "start": "next start",
     "lint": "next lint",
     "create-user": "npx tsc --noEmit && node --no-warnings=ExperimentalWarning --loader ts-node/esm scripts/create-user.ts"
