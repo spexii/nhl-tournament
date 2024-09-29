@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { headers } from "next/headers";
+import { Montserrat, Open_Sans } from "next/font/google";
 
 import Layout from "@/components/Layout";
-import { AuthProvider } from "@/lib/AuthContext";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const montserrat = Montserrat({ subsets: ["latin"], variable: '--font-montserrat' });
+const openSans = Open_Sans({ subsets: ["latin"], variable: '--font-open-sans' });
 
 export const metadata: Metadata = {
   title: "Shemale Cup",
@@ -18,20 +17,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headerStore = headers();
-  const authenticated = headerStore.get('X-User-Authenticated') === 'true';
-  console.log('authenticated header', authenticated);
-  const admin = headerStore.get('X-User-Admin') === 'true';
-  console.log('admin header', admin);
-
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider isAuthenticated={authenticated} isAdmin={admin}>
-          <Layout>
-            {children}
-          </Layout>
-        </AuthProvider>
+    <html lang="en" className={`${montserrat.variable} ${openSans.variable}`}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+      <body>
+        <Layout>
+          {children}
+        </Layout>
       </body>
     </html>
   );

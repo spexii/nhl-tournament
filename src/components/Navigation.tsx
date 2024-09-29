@@ -1,16 +1,25 @@
 'use client'
 
-import { useAuth } from "@/lib/AuthContext";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { useCurrentSession } from '@/hooks/useCurrentSession';
+import { isAdmin } from '@/lib/utils';
+import { LogoutButton } from './LogoutButton';
 
 const Navigation: React.FC = () => {
-  const { authenticated, admin } = useAuth();
+  const { session, status } = useCurrentSession()
+
+  const authenticated = status === 'authenticated';
+  const admin = isAdmin(session?.user.role)
+
+  const pathname = usePathname();
   
-  const links = [
-    { href: '/', text: 'Etusivu' },
-  ];
+  const links = [];
 
   if (authenticated) {
     links.push(
+      { href: '/', text: 'Etusivu' },
       { href: '/tournaments', text: 'Turnaukset' },
       { href: '/statistics', text: 'Tilastot' },
     );
@@ -22,21 +31,26 @@ const Navigation: React.FC = () => {
     );
   }
 
-  if(authenticated) {
-    links.push(
-      { href: '/logout', text: 'Kirjaudu ulos' },
-    );
-  } else {
-    links.push(
-      { href: '/login', text: 'Kirjaudu sisään' },
-    );
+  if(links.length === 0) {
+    return null;
   }
 
   return (
-    <nav className="flex w-full max-w-7xl m-6 p-6 justify-center space-x-4">
+    <nav className="flex w-full max-w-7xl m-6 justify-center space-x-4 hidden lg:flex text-xl font-open-sans">
       {links.map(link => (
-        <a key={link.href} href={link.href} className="text-xl font-bold hover:underline">{link.text}</a>
+        <Link
+          key={link.href}
+          href={link.href}
+          className={`
+            relative uppercase
+            ${pathname === link.href ? 'text-link-active-green selected' : 'text-link-green'}
+            hover:text-link-active-green
+          `}
+        >
+          {link.text}
+        </Link>
       ))}
+      {authenticated && <LogoutButton />}
     </nav>
   );
 };
