@@ -10,6 +10,7 @@ const db = new PrismaClient();
 // auth.ts doesn't work in the script
 enum Role {
   ADMIN = "ADMIN",
+  MODERATOR = "MODERATOR",
   USER = "USER",
 }
 
@@ -23,6 +24,10 @@ const createUser = async () => {
       {
         name: 'Ylläpitäjä',
         value: Role.ADMIN
+      },
+      {
+        name: 'Moderaattori',
+        value: Role.MODERATOR
       },
       {
         name: 'Peruskäyttäjä',

@@ -5,6 +5,8 @@ export const convertPrismaRoleToTypeScriptRole = (role: PrismaRole): TypeScriptR
   switch (role) {
     case PrismaRole.USER:
       return TypeScriptRole.USER;
+    case PrismaRole.MODERATOR:
+      return TypeScriptRole.MODERATOR;
     case PrismaRole.ADMIN:
       return TypeScriptRole.ADMIN;
     default:
