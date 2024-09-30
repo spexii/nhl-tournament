@@ -10,6 +10,7 @@ datasource db {
 // User roles
 enum Role {
   USER
+  MODERATOR
   ADMIN
 }
 
@@ -18,7 +19,7 @@ model User {
   username  String   @unique
   password  String
   role      Role     @default(USER)
-  email     String?   @unique
+  email     String?
   firstName String?
   lastName  String?
   lastLogin DateTime?
