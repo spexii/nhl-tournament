@@ -15,3 +15,23 @@ export const convertPrismaRoleToTypeScriptRole = (role: PrismaRole): TypeScriptR
 };
 
 export const isAdmin = (role: TypeScriptRole | undefined) => role === TypeScriptRole.ADMIN;
+
+export const getLinks = (authenticated: boolean, admin: boolean) => {
+  const links = [];
+
+  if (authenticated) {
+    links.push(
+      { href: '/', text: 'Etusivu' },
+      { href: '/tournaments', text: 'Turnaukset' },
+      { href: '/statistics', text: 'Tilastot' },
+    );
+  }
+
+  if(admin) {
+    links.push(
+      { href: '/admin', text: 'Ylläpito' },
+    );
+  }
+
+  return links;
+}

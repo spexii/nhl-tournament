@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { useCurrentSession } from '@/hooks/useCurrentSession';
-import { isAdmin } from '@/lib/utils';
+import { getLinks, isAdmin } from '@/lib/utils';
 import { LogoutButton } from './LogoutButton';
 
 const Navigation: React.FC = () => {
@@ -14,22 +14,8 @@ const Navigation: React.FC = () => {
   const admin = isAdmin(session?.user.role)
 
   const pathname = usePathname();
-  
-  const links = [];
 
-  if (authenticated) {
-    links.push(
-      { href: '/', text: 'Etusivu' },
-      { href: '/tournaments', text: 'Turnaukset' },
-      { href: '/statistics', text: 'Tilastot' },
-    );
-  }
-
-  if(admin) {
-    links.push(
-      { href: '/admin', text: 'Ylläpito' },
-    );
-  }
+  const links = getLinks(authenticated, admin);
 
   if(links.length === 0) {
     return null;
