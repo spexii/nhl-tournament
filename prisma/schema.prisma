@@ -15,14 +15,38 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username  String   @unique
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username  String     @unique
   password  String
-  role      Role     @default(USER)
+  role      Role       @default(USER)
   email     String?
   firstName String?
   lastName  String?
   lastLogin DateTime?
+  player    Player?
+  image     UserImage?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Player {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  nicknames     String?
+  birthday      DateTime?
+  introduction  String?
+  whatOthersSay String?
+  user          User      @relation(fields: [userId], references: [id])
+  userId        String    @unique @db.Uuid
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model UserImage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  imageId   Int      @unique @default(autoincrement())
+  path      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @unique @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
